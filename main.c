@@ -16,22 +16,29 @@ int main() {
 
     // Run FCFS
     int total_fcfs = fcfs_schedule(start, requests, REQUEST_COUNT, order_fcfs);
-    printf("=== FCFS ===\nOrder of Service:\n");
+    printf("=== FCFS ===\nOrder of Service with Movements:\n");
+    int current = start;
     for (int i = 0; i < REQUEST_COUNT; i++) {
-        printf("%d ", order_fcfs[i]);
+        int movement = abs(current - order_fcfs[i]);
+        printf("From %d to %d: moved %d cylinders\n", current, order_fcfs[i], movement);
+        current = order_fcfs[i];
     }
-    printf("\nTotal Distance Moved: %d cylinders\n\n", total_fcfs);
+    printf("Total Distance Moved: %d cylinders\n\n", total_fcfs);
 
     // Run SSTF
     int total_sstf = sstf_schedule(start, requests, REQUEST_COUNT, order_sstf);
-    printf("=== SSTF ===\nOrder of Service:\n");
+    printf("=== SSTF ===\nOrder of Service with Movements:\n");
+    current = start;
     for (int i = 0; i < REQUEST_COUNT; i++) {
-        printf("%d ", order_sstf[i]);
+        int movement = abs(current - order_sstf[i]);
+        printf("From %d to %d: moved %d cylinders\n", current, order_sstf[i], movement);
+        current = order_sstf[i];
     }
-    printf("\nTotal Distance Moved: %d cylinders\n", total_sstf);
+    printf("Total Distance Moved: %d cylinders\n", total_sstf);
 
     return 0;
 }
+
 
 int fcfs_schedule(int start, int requests[], int count, int result[]) {
     int total = 0;
