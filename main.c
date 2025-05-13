@@ -77,8 +77,69 @@ void scan() {
     printf("\nTotal Distance: %d\n", total_distance);
 }
 
+// LOOK Algorithm
+void look() {
+    int total_distance = 0;
+    int current = current_position;
+    int direction = (current_position > previous_position) ? 1 : -1; // 1 for increasing, -1 for decreasing
+
+    int sorted_requests[REQUESTS + 1];
+    for (int i = 0; i < REQUESTS; i++) {
+        sorted_requests[i] = requests[i];
+    }
+    sorted_requests[REQUESTS] = current;
+    for (int i = 0; i < REQUESTS; i++) {
+        for (int j = i + 1; j <= REQUESTS; j++) {
+            if (sorted_requests[i] > sorted_requests[j]) {
+                int temp = sorted_requests[i];
+                sorted_requests[i] = sorted_requests[j];
+                sorted_requests[j] = temp;
+            }
+        }
+    }
+
+    int index = 0;
+    for (int i = 0; i <= REQUESTS; i++) {
+        if (sorted_requests[i] == current) {
+            index = i;
+            break;
+        }
+    }
+
+    printf("LOOK Order: %d", current);
+    if (direction == 1) {
+        for (int i = index + 1; i <= REQUESTS; i++) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+        for (int i = index - 1; i >= 0; i--) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+    } else {
+        for (int i = index - 1; i >= 0; i--) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+        for (int i = index + 1; i <= REQUESTS; i++) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+    }
+    printf("\nTotal Distance: %d\n", total_distance);
+}
+
 int main() {
 
     printf("\nSCAN Algorithm:\n");
     scan();
+
+    printf("\nLOOK:\n");
+    look();
+
+    return 0;
 }
