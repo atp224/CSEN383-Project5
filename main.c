@@ -1,152 +1,84 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <limits.h>
 
-#define REQUEST_COUNT 10
-#define CYLINDER_MAX 4999   // Assuming max cylinder number (end of disk)
+#define CYLINDERS 5000
+#define REQUESTS 10
 
-int fcfs_schedule(int start, int requests[], int count, int result[]);
-int sstf_schedule(int start, int requests[], int count, int result[]);
-int scan_schedule(int start, int requests[], int count, int result[], int direction); // direction: 0=left, 1=right
+int requests[REQUESTS] = {2055, 1175, 2304, 2700, 513, 1680, 256, 1401, 4922, 3692};
+int current_position = 2255;
+int previous_position = 1723;
 
-int compare(const void *a, const void *b) {
-    return (*(int *)a - *(int *)b);
+// Function to calculate absolute difference
+int abs_diff(int a, int b) {
+    return abs(a - b);
+}
+
+
+// SCAN (Elevator Algorithm)
+void scan() {
+    int total_distance = 0;
+    int current = current_position;
+    int direction = (current_position > previous_position) ? 1 : -1; // 1 for increasing, -1 for decreasing
+
+    int sorted_requests[REQUESTS + 1];
+    for (int i = 0; i < REQUESTS; i++) {
+        sorted_requests[i] = requests[i];
+    }
+    sorted_requests[REQUESTS] = current;
+    for (int i = 0; i < REQUESTS; i++) {
+        for (int j = i + 1; j <= REQUESTS; j++) {
+            if (sorted_requests[i] > sorted_requests[j]) {
+                int temp = sorted_requests[i];
+                sorted_requests[i] = sorted_requests[j];
+                sorted_requests[j] = temp;
+            }
+        }
+    }
+
+    int index = 0;
+    for (int i = 0; i <= REQUESTS; i++) {
+        if (sorted_requests[i] == current) {
+            index = i;
+            break;
+        }
+    }
+
+    printf("SCAN Order: %d", current);
+    if (direction == 1) {
+        for (int i = index + 1; i <= REQUESTS; i++) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+        total_distance += abs_diff(current, CYLINDERS - 1);
+        current = CYLINDERS - 1;
+        printf(" -> %d", current);
+        for (int i = index - 1; i >= 0; i--) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+    } else {
+        for (int i = index - 1; i >= 0; i--) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+        total_distance += abs_diff(current, 0);
+        current = 0;
+        printf(" -> %d", current);
+        for (int i = index + 1; i <= REQUESTS; i++) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+    }
+    printf("\nTotal Distance: %d\n", total_distance);
 }
 
 int main() {
-    int start = 2255;
-    int requests[REQUEST_COUNT] = {2055, 1175, 2304, 2700, 513, 1680, 256, 1401, 4922, 3692};
-    int order_fcfs[REQUEST_COUNT];
-    int order_sstf[REQUEST_COUNT];
-    int order_scan[REQUEST_COUNT];
 
-    // FCFS
-    int total_fcfs = fcfs_schedule(start, requests, REQUEST_COUNT, order_fcfs);
-    printf("=== FCFS ===\nOrder of Service with Movements:\n");
-    int current = start;
-    for (int i = 0; i < REQUEST_COUNT; i++) {
-        int movement = abs(current - order_fcfs[i]);
-        printf("From %d to %d: moved %d cylinders\n", current, order_fcfs[i], movement);
-        current = order_fcfs[i];
-    }
-    printf("Total Distance Moved: %d cylinders\n\n", total_fcfs);
-
-    // SSTF
-    int total_sstf = sstf_schedule(start, requests, REQUEST_COUNT, order_sstf);
-    printf("=== SSTF ===\nOrder of Service with Movements:\n");
-    current = start;
-    for (int i = 0; i < REQUEST_COUNT; i++) {
-        int movement = abs(current - order_sstf[i]);
-        printf("From %d to %d: moved %d cylinders\n", current, order_sstf[i], movement);
-        current = order_sstf[i];
-    }
-<<<<<<< HEAD
-    printf("\nTotal Distance Moved: %d cylinders\n\n", total_sstf);
-
-    // SCAN (Assuming initial direction is RIGHT)
-    int total_scan = scan_schedule(start, requests, REQUEST_COUNT, order_scan, 1);
-    printf("=== SCAN (Right) ===\nOrder of Service:\n");
-    for (int i = 0; i < REQUEST_COUNT; i++) {
-        printf("%d ", order_scan[i]);
-    }
-    printf("\nTotal Distance Moved: %d cylinders\n", total_scan);
-=======
-    printf("Total Distance Moved: %d cylinders\n", total_sstf);
->>>>>>> 7f6135f69f9611044a30cb1f09f20d9bad86d326
-
-    return 0;
-}
-
-
-int fcfs_schedule(int start, int requests[], int count, int result[]) {
-    int total = 0;
-    int current = start;
-
-    for (int i = 0; i < count; i++) {
-        result[i] = requests[i];
-        total += abs(current - requests[i]);
-        current = requests[i];
-    }
-
-    return total;
-}
-
-int sstf_schedule(int start, int requests[], int count, int result[]) {
-    int total = 0;
-    int current = start;
-    int processed[REQUEST_COUNT] = {0};
-
-    for (int i = 0; i < count; i++) {
-        int min_distance = __INT_MAX__;
-        int index = -1;
-
-        for (int j = 0; j < count; j++) {
-            if (!processed[j]) {
-                int distance = abs(current - requests[j]);
-                if (distance < min_distance) {
-                    min_distance = distance;
-                    index = j;
-                }
-            }
-        }
-        if (index != -1) {
-            result[i] = requests[index];
-            total += abs(current - requests[index]);
-            current = requests[index];
-            processed[index] = 1;
-        }
-    }
-    return total;
-}
-
-int scan_schedule(int start, int requests[], int count, int result[], int direction) {
-    int total = 0;
-    int current = start;
-    int sorted[REQUEST_COUNT];
-    for (int i = 0; i < count; i++) {
-        sorted[i] = requests[i];
-    }
-
-    qsort(sorted, count, sizeof(int), compare);
-
-    int index = 0;
-    while (index < count && sorted[index] < current) {
-        index++;
-    }
-
-    int res_index = 0;
-
-    if (direction == 1) { // Moving right
-        for (int i = index; i < count; i++) {
-            result[res_index++] = sorted[i];
-            total += abs(current - sorted[i]);
-            current = sorted[i];
-        }
-        if (index > 0) {
-            total += abs(current - CYLINDER_MAX);
-            current = CYLINDER_MAX;
-            for (int i = index - 1; i >= 0; i--) {
-                result[res_index++] = sorted[i];
-                total += abs(current - sorted[i]);
-                current = sorted[i];
-            }
-        }
-    } else { // Moving left
-        for (int i = index - 1; i >= 0; i--) {
-            result[res_index++] = sorted[i];
-            total += abs(current - sorted[i]);
-            current = sorted[i];
-        }
-        if (index < count) {
-            total += abs(current - 0);
-            current = 0;
-            for (int i = index; i < count; i++) {
-                result[res_index++] = sorted[i];
-                total += abs(current - sorted[i]);
-                current = sorted[i];
-            }
-        }
-    }
-
-    return total;
+    printf("\nSCAN Algorithm:\n");
+    scan();
 }
