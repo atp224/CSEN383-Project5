@@ -22,18 +22,25 @@ int main() {
 
     // FCFS
     int total_fcfs = fcfs_schedule(start, requests, REQUEST_COUNT, order_fcfs);
-    printf("=== FCFS ===\nOrder of Service:\n");
+    printf("=== FCFS ===\nOrder of Service with Movements:\n");
+    int current = start;
     for (int i = 0; i < REQUEST_COUNT; i++) {
-        printf("%d ", order_fcfs[i]);
+        int movement = abs(current - order_fcfs[i]);
+        printf("From %d to %d: moved %d cylinders\n", current, order_fcfs[i], movement);
+        current = order_fcfs[i];
     }
-    printf("\nTotal Distance Moved: %d cylinders\n\n", total_fcfs);
+    printf("Total Distance Moved: %d cylinders\n\n", total_fcfs);
 
     // SSTF
     int total_sstf = sstf_schedule(start, requests, REQUEST_COUNT, order_sstf);
-    printf("=== SSTF ===\nOrder of Service:\n");
+    printf("=== SSTF ===\nOrder of Service with Movements:\n");
+    current = start;
     for (int i = 0; i < REQUEST_COUNT; i++) {
-        printf("%d ", order_sstf[i]);
+        int movement = abs(current - order_sstf[i]);
+        printf("From %d to %d: moved %d cylinders\n", current, order_sstf[i], movement);
+        current = order_sstf[i];
     }
+<<<<<<< HEAD
     printf("\nTotal Distance Moved: %d cylinders\n\n", total_sstf);
 
     // SCAN (Assuming initial direction is RIGHT)
@@ -43,9 +50,13 @@ int main() {
         printf("%d ", order_scan[i]);
     }
     printf("\nTotal Distance Moved: %d cylinders\n", total_scan);
+=======
+    printf("Total Distance Moved: %d cylinders\n", total_sstf);
+>>>>>>> 7f6135f69f9611044a30cb1f09f20d9bad86d326
 
     return 0;
 }
+
 
 int fcfs_schedule(int start, int requests[], int count, int result[]) {
     int total = 0;
