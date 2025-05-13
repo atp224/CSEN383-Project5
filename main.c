@@ -14,6 +14,48 @@ int abs_diff(int a, int b) {
     return abs(a - b);
 }
 
+// fcfs algorithm(aaron)
+void fcfs() {
+    int total_distance = 0;
+    int current = current_position;
+
+    printf("FCFS Order: %d", current);
+    for (int i = 0; i < REQUESTS; i++) {
+        total_distance += abs_diff(current, requests[i]);
+        current = requests[i];
+        printf(" -> %d", current);
+    }
+    printf("\nTotal Distance: %d\n", total_distance);
+}
+
+// shortest seek time first algorithm (aaron)
+void sstf() {
+    int total_distance = 0;
+    int current = current_position;
+    int visited[REQUESTS] = {0};
+
+    printf("SSTF Order: %d", current);
+    for (int i = 0; i < REQUESTS; i++) {
+        int min_distance = INT_MAX;
+        int next_index = -1;
+
+        for (int j = 0; j < REQUESTS; j++) {
+            if (!visited[j]) {
+                int distance = abs_diff(current, requests[j]);
+                if (distance < min_distance) {
+                    min_distance = distance;
+                    next_index = j;
+                }
+            }
+        }
+
+        visited[next_index] = 1;
+        total_distance += min_distance;
+        current = requests[next_index];
+        printf(" -> %d", current);
+    }
+    printf("\nTotal Distance: %d\n", total_distance);
+}
 
 // SCAN (Elevator Algorithm)
 void scan() {
@@ -134,6 +176,12 @@ void look() {
 }
 
 int main() {
+
+    printf("\nFCFS Algorithm:\n");
+    fcfs();
+
+    printf("\nSSTF Algorithm:\n");
+    sstf();
 
     printf("\nSCAN Algorithm:\n");
     scan();
