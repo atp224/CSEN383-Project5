@@ -251,6 +251,63 @@ void c_scan() {
     printf("\nTotal Distance: %d\n", total_distance);
 }
 
+// C Look Algorithm
+
+void c_look() {
+    int total_distance = 0;
+    int current = current_position;
+
+    int sorted_requests[REQUESTS + 1];
+    for (int i = 0; i < REQUESTS; i++) {
+        sorted_requests[i] = requests[i];
+    }
+    sorted_requests[REQUESTS] = current;
+
+    // Sort the requests
+    for (int i = 0; i < REQUESTS; i++) {
+        for (int j = i + 1; j <= REQUESTS; j++) {
+            if (sorted_requests[i] > sorted_requests[j]) {
+                int temp = sorted_requests[i];
+                sorted_requests[i] = sorted_requests[j];
+                sorted_requests[j] = temp;
+            }
+        }
+    }
+
+    int index = 0;
+    for (int i = 0; i <= REQUESTS; i++) {
+        if (sorted_requests[i] == current) {
+            index = i;
+            break;
+        }
+    }
+
+    printf("C-LOOK Order: %d", current);
+
+    // Serve the right side first
+    for (int i = index + 1; i <= REQUESTS; i++) {
+        total_distance += abs_diff(current, sorted_requests[i]);
+        current = sorted_requests[i];
+        printf(" -> %d", current);
+    }
+
+    // Jump back to the start of the queue if there are left requests
+    if (index > 0) {
+        total_distance += abs_diff(current, sorted_requests[0]);
+        current = sorted_requests[0];
+        printf(" -> %d", current);
+
+        for (int i = 1; i < index; i++) {
+            total_distance += abs_diff(current, sorted_requests[i]);
+            current = sorted_requests[i];
+            printf(" -> %d", current);
+        }
+    }
+
+    printf("\nTotal Distance: %d\n", total_distance);
+}
+
+// Main function
 
 int main() {
 
@@ -268,6 +325,9 @@ int main() {
 
     printf("\nC-SCAN Algorithm:\n");
     c_scan();
+
+    printf("\nC-LOOK Algorithm:\n");
+    c_look();
 
     return 0;
 }
