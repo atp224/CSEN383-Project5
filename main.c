@@ -320,7 +320,7 @@ int main() {
     printf("\nSCAN Algorithm:\n");
     scan();
 
-    printf("\nLOOK:\n");
+    printf("\nLOOK Algorithm:\n");
     look();
 
     printf("\nC-SCAN Algorithm:\n");
